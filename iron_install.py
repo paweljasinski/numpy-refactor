@@ -10,6 +10,13 @@ from os.path import dirname, isdir, isfile, join
 
 src_dir = join(os.getcwd(), "numpy")
 
+
+def check_ignore_dir(directory, dirs):
+    for d in dirs:
+        if directory.startswith(d):
+            return True
+    return False
+
 def install():
     print "INSTALLING ..."
     sp_dir = join(sys.prefix, r'Lib\site-packages')
@@ -18,7 +25,10 @@ def install():
     if not isdir(dll_dir):
         os.mkdir(dll_dir)
 
-    ignore_pys = ["setup.py", "iron_install.py"]
+    ignore_pys = ["setup.py", "iron_install.py", "iron_setup.py", "iron_egg.py",
+            "pavement.py", "setupegg.py", "setupscons.py", "setupsconsegg.py"]
+    ignore_pys_dirs = [ r".\benchmarks", r".\doc", r".\libndarray", r".\tools"]
+    ignore_dirs = [r".\.git"]
     ignore_libs = ["Microsoft.Scripting.dll",
                    "Microsoft.Scripting.Metadata.dll",
                    "Microsoft.Dynamic.dll",
@@ -28,10 +38,13 @@ def install():
     # Recursively walk the directory tree and copy all .py files into the
     # site-packages directory and all .dll files into DLLs.
     for root, dirs, files in os.walk("."):
+        if check_ignore_dir(root, ignore_dirs):
+            continue
         for fn in files:
             rel_path = join(root, fn)
             #rel_path = abs_path[len(numpy_dir) + 1:]
-            if fn.endswith('.py') and fn not in ignore_pys:
+            print root, dirs, fn
+            if fn.endswith('.py') and fn not in ignore_pys and not check_ignore_dir(root, ignore_pys_dirs):
                 #print "abs_path = %s, relpath = %s" % ("", rel_path)
                 dst_dir = dirname(join(sp_dir, rel_path))
                 if not isdir(dst_dir):
@@ -88,4 +101,13 @@ if not release:
 
 
 if __name__ == '__main__':
-    install()
+    try:
+        install()
+    except WindowsError as ex:
+        print "#"*80
+        print
+        print "you have no rights to write to: %s" % sys.prefix
+        print "please, rerun iron_install.py in a shell with Administrator privilages"
+        print
+        print "#"*80
+        print ex

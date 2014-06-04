@@ -24,4 +24,13 @@ def msbuild():
 
 if __name__ == '__main__':
     msbuild()
-    install()
+    try:
+        install()
+    except IOError as ex:
+        print "#"*80
+        print
+        print "Install failed, most likely you don't have rights to write into %s" % sys.prefix
+        print "please, rerun iron_install.py in a shell with Administrator privilages"
+        print
+        print "#"*80
+        print ex
