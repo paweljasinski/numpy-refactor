@@ -26,7 +26,7 @@ if __name__ == '__main__':
     msbuild()
     try:
         install()
-    except IOError as ex:
+    except (IOError, WindowsError) as ex:
         print "#"*80
         print
         print "Install failed, most likely you don't have rights to write into %s" % sys.prefix

@@ -43,7 +43,6 @@ def install():
         for fn in files:
             rel_path = join(root, fn)
             #rel_path = abs_path[len(numpy_dir) + 1:]
-            print root, dirs, fn
             if fn.endswith('.py') and fn not in ignore_pys and not check_ignore_dir(root, ignore_pys_dirs):
                 #print "abs_path = %s, relpath = %s" % ("", rel_path)
                 dst_dir = dirname(join(sp_dir, rel_path))
@@ -103,7 +102,7 @@ if not release:
 if __name__ == '__main__':
     try:
         install()
-    except WindowsError as ex:
+    except (IOError, WindowsError) as ex:
         print "#"*80
         print
         print "you have no rights to write to: %s" % sys.prefix
